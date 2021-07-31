@@ -1,3 +1,8 @@
+"use strict";
+exports.__esModule = true;
+exports.Puzzle = void 0;
+var min_pq_js_1 = require("./min-pq.js");
+var min_pq_js_2 = require("./min-pq.js");
 var Puzzle = /** @class */ (function () {
     function Puzzle(tiles) {
         this.tiles = [];
@@ -40,6 +45,25 @@ var Puzzle = /** @class */ (function () {
     };
     Puzzle.prototype.isSolveable = function () {
         return (this.inversions() % 2 == 0);
+    };
+    Puzzle.prototype.manhattan = function () {
+        var manhattan = 0;
+        var tiles2D = this.tiles2DCopy();
+        for (var i = 0; i < this.dimension; i++) {
+            for (var j = 0; j < this.dimension; j++) {
+                var tile = tiles2D[i][j];
+                if (tile == 0)
+                    continue;
+                manhattan += (this.vertDist(tile, i) + this.horDist(tile, j));
+            }
+        }
+        return manhattan;
+    };
+    Puzzle.prototype.vertDist = function (tile, row) {
+        return Math.abs(Math.floor((tile - 1) / this.dimension - row));
+    };
+    Puzzle.prototype.horDist = function (tile, col) {
+        return Math.abs((tile - 1) % this.dimension - col);
     };
     Puzzle.prototype.inversions = function () {
         var inversions = 0;
@@ -100,17 +124,51 @@ var Puzzle = /** @class */ (function () {
     };
     Puzzle.prototype.print = function () {
         var tiles2D = this.tiles2DCopy();
-        console.log(tiles2D);
+        tiles2D.forEach(function (tile) {
+            console.log(tile);
+        });
+        console.log("\n");
+    };
+    Puzzle.prototype.solvePuzzle = function () {
+        if (!this.isSolveable)
+            throw console.error("Not Solveable");
+        var pq = new min_pq_js_1.MinPQ();
+        var initNode = new min_pq_js_2.SearchNode(null, this, 0);
+        pq.insert(initNode);
+        var currNode = initNode;
+        var currPuzzle = this;
+        while (!currPuzzle.isSolved()) {
+            var possibleMoves = currPuzzle.possibleMoves();
+            possibleMoves.forEach(function (move) {
+                var newMoves = currNode.movesMade + 1;
+                if (currNode.movesMade == 0) {
+                    pq.insert(new min_pq_js_2.SearchNode(currNode, move, newMoves));
+                }
+                else if (!move.equals(currNode.previous.currPuzzle)) {
+                    pq.insert(new min_pq_js_2.SearchNode(currNode, move, newMoves));
+                }
+            });
+            currNode = pq.rmMin();
+            currPuzzle = currNode.currPuzzle;
+        }
+        var minMoves = currNode.movesMade;
+        var path = [];
+        while (currNode != null) {
+            path.push(currNode.currPuzzle);
+            currNode = currNode.previous;
+        }
+        var steps = [];
+        while (path.length > 0)
+            steps.push(path.pop());
+        return steps;
     };
     return Puzzle;
 }());
-var myTiles = [
-    [1, 2, 3],
-    [4, 0, 6],
-    [7, 8, 5]
-];
-console.log("Hello");
-var myBoard = new Puzzle(myTiles);
-myBoard.possibleMoves().forEach(function (move) {
-    move.print();
+exports.Puzzle = Puzzle;
+var myPuzzle = new Puzzle([[3, 7, 8],
+    [6, 2, 4],
+    [1, 0, 5]]);
+var steps = myPuzzle.solvePuzzle();
+steps.forEach(function (step) {
+    step.print();
 });

@@ -1,4 +1,7 @@
-class Puzzle {
+import {MinPQ} from './min-pq.js'
+import {SearchNode} from './min-pq.js'
+
+export class Puzzle {
 
     tiles: number[];
     dimension: number;
@@ -8,10 +11,10 @@ class Puzzle {
 
     constructor(tiles: number[][]){
         this.tiles = [];
-        this.blankIndex = -1
-        this.blankRow = -1
+        this.blankIndex = -1;
+        this.blankRow = -1;
         this.blankCol = -1;
-        this.dimension = tiles.length
+        this.dimension = tiles.length;
 
         let currIndex = 0;
         for(let i=0; i<tiles.length; i++){
@@ -56,6 +59,29 @@ class Puzzle {
 
     isSolveable(): boolean {
         return (this.inversions() % 2 == 0);
+    }
+
+    manhattan(){
+        let manhattan: number = 0;
+        const tiles2D = this.tiles2DCopy(); 
+        for (let i = 0; i < this.dimension; i++) {
+            for (let j = 0; j < this.dimension; j++) {
+                const tile: number = tiles2D[i][j];
+                if (tile == 0)
+                    continue;
+                manhattan += (this.vertDist(tile, i) + this.horDist(tile, j));
+            }
+        }
+
+        return manhattan;
+    }
+
+    private vertDist(tile: number, row: number){
+        return Math.abs(Math.floor((tile - 1) / this.dimension - row));
+    }
+
+    private horDist(tile: number, col: number ){
+        return Math.abs((tile - 1) % this.dimension - col);
     }
 
     private inversions(): number {
@@ -124,18 +150,59 @@ class Puzzle {
 
     print() {
         const tiles2D = this.tiles2DCopy();
-        console.log(tiles2D);
+        tiles2D.forEach(tile => {
+            console.log(tile);
+        })
+        console.log("\n");
+    }
+
+    solvePuzzle(): Puzzle[]{
+        if(!this.isSolveable)
+            throw console.error("Not Solveable");
+        const pq = new MinPQ();
+        const initNode: SearchNode = new SearchNode(null, this, 0);
+
+        pq.insert(initNode);
+        
+        let currNode: SearchNode = initNode;
+        let currPuzzle: Puzzle = this;
+
+        while (!currPuzzle.isSolved()) {
+            const possibleMoves = currPuzzle.possibleMoves();
+
+            possibleMoves.forEach(move => {
+                const newMoves = currNode.movesMade + 1;
+                if (currNode.movesMade == 0) {
+                    pq.insert(new SearchNode(currNode, move, newMoves));
+                }
+                else if (!move.equals(currNode.previous.currPuzzle)) {
+                    pq.insert(new SearchNode(currNode, move, newMoves));
+                }
+            })
+            currNode = pq.rmMin();
+            currPuzzle = currNode.currPuzzle;
+        }
+
+        const minMoves = currNode.movesMade;
+
+        const path: Puzzle[] = [];
+        while (currNode != null) {
+            path.push(currNode.currPuzzle);
+            currNode = currNode.previous;
+        }
+
+        const steps: Puzzle[] = [];
+        while(path.length > 0)
+            steps.push(path.pop());
+        return steps;
     }
 
 }
 
-const myTiles = [
-    [1, 2, 3],
-    [4, 0, 6],
-    [7, 8, 5]
-];
-
-const myBoard = new Puzzle(myTiles);
-myBoard.possibleMoves().forEach(move => {
-    move.print();
+const myPuzzle = new Puzzle([[3, 7, 8], 
+                             [6, 2, 4], 
+                             [1, 0, 5]]);
+const steps = myPuzzle.solvePuzzle();
+steps.forEach(step => {
+    step.print();
 });
