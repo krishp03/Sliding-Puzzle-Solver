@@ -1,0 +1,68 @@
+@font-face {
+    font-family: "logo-font";
+    src: url(fonts/Anurati-Regular.otf)
+  }
+  
+  @font-face {
+    font-family: "main-font";
+    src: url(fonts/TitilliumWeb-Regular.ttf);
+  }
+  
+  * {
+    font-family: 'main-font';
+  }
+  
+  .hero-body {
+    background: linear-gradient(90deg, rgba(255,25,244,1) 0%, rgba(240,120,0,1) 100%);
+  }
+  body {
+    background: linear-gradient(90deg, rgba(255,25,244,1) 0%, rgba(240,120,0,1) 100%);
+  }
+  
+  .is-centered {
+    background: linear-gradient(90deg, rgba(255,25,244,1) 0%, rgba(240,120,0,1) 100%);
+  }
+  .title {
+    color: white;
+  }
+  
+  .subtitle{
+    color: white;
+  }
+  .card{
+    background: transparent;
+  }
+  .card-content.s1{
+    background: transparent;
+  }
+  
+  img {
+    padding: 5px;
+  }
+  
+  .logo{
+    font-family: logo-font;
+    font-size: 50pt !important;
+  }
+  
+  footer{
+    padding: 50px;
+    color: white;
+    text-align: center;
+  }
+
+  .description {
+      color: white;
+  }
+
+  #continue {
+      border-color: white;
+      color: white;
+  }
+
+  #continue:hover {
+    background: white;
+    color: black;
+}
+
+  
