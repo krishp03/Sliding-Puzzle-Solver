@@ -1,0 +1,36 @@
+@font-face {
+    font-family: "logo-font";
+    src: url(fonts/Anurati-Regular.otf)
+}
+
+@font-face {
+    font-family: "main-font";
+    src: url(fonts/TitilliumWeb-Regular.ttf);
+}
+  
+* {
+    color: white !important;
+    font-family: 'main-font';
+}
+
+.logo {
+    font-family: logo-font;
+}
+
+body{
+    background: linear-gradient(90deg, rgba(255,25,244,1) 0%, rgba(240,120,0,1) 100%);
+}
+
+.input-board {
+    display: grid;
+    grid-template-columns: repeat(3, 33%);
+    position: absolute;
+    left: 36vw;
+    height: 50vh;
+    width: 28vw;
+}
+
+.input-box {
+    width: 100%;
+    outline:2px solid white;
+}
